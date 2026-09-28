@@ -43,3 +43,4 @@ tests/e2e/_artifacts/
 .idea/
 .vscode/
 *.swp
+.worktrees/
