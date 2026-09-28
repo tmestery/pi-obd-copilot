@@ -67,6 +67,9 @@ Changelog = "https://github.com/tmestery/pi-obd-copilot/blob/main/CHANGELOG.md"
 [tool.hatch.build.targets.wheel]
 packages = ["src/gti_copilot"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"config" = "gti_copilot/_bundled/config"
+
 [tool.hatch.build.targets.sdist]
 exclude = ["/src/gti_copilot/web/node_modules", "/.venv", "/docs/images/*.gif"]
 
