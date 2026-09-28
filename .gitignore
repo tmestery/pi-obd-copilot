@@ -1,0 +1,45 @@
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+coverage.xml
+htmlcov/
+.coverage*
+
+# node / vite (frontend)
+src/gti_copilot/web/node_modules/
+src/gti_copilot/web/dist/
+src/gti_copilot/web/coverage/
+src/gti_copilot/web/test-results/
+src/gti_copilot/web/playwright-report/
+
+# runtime data
+data/runtime/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+clips/
+models/
+*.gguf
+*.onnx
+*.mp4
+!tests/fixtures/**/*.mp4
+
+# image pipeline scratch (final PNG/SVG/GIF in docs/images ARE committed)
+docs/images/_work/
+tests/e2e/_artifacts/
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
