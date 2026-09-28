@@ -1,0 +1,142 @@
+# gti-copilot configuration
+#
+# Copy to /etc/gti-copilot/config.yaml (Pi) or pass --config <file>.
+# Every key can be overridden with an environment variable:
+#   GTI_<SECTION>__<KEY>=value   e.g. GTI_OBD__DEVICE=/dev/ttyUSB0, GTI_API__PORT=9000
+# Validate with:  gti-copilot config validate --config config/gti-copilot.example.yaml
+# JSON schema:    gti-copilot config schema
+
+mode: sim                     # sim | car
+
+units:
+  system: imperial            # imperial | metric
+  # pressure: psi             # psi | bar | kpa   (override individual units if you like)
+  # speed: mph
+  # temperature: f
+  # distance: mi
+
+vehicle: config/vehicle/mk7-gti.yaml
+
+obd:
+  transport: sim              # sim | elm
+  device: /dev/rfcomm0        # OBDLink MX+ over Bluetooth RFCOMM, or /dev/ttyUSB0 for OBDLink SX
+  baud: 115200
+  timeout_s: 1.0
+  protocol: "6"               # ISO 15765-4 CAN 11-bit 500 kbaud (MK7 GTI)
+  reconnect_min_s: 1.0
+  reconnect_max_s: 30.0
+  dtc_poll_s: 60
+
+scheduler:
+  fast_hz: 6.0                # RPM, speed, throttle, MAP
+  medium_hz: 1.5              # load, timing, MAF, pedal
+  slow_hz: 0.25               # coolant, IAT, ambient, baro, trims, voltage, fuel level
+  max_reads_per_s: 15         # realistic ceiling for ELM/STN adapters
+
+storage:
+  path: data/runtime/gti-copilot.sqlite
+  batch_rows: 200
+  batch_interval_s: 1.0
+  checkpoint_interval_s: 60
+  retention_days: 365
+  downsample_after_days: 30
+  downsample_keep_every: 10
+  max_db_mb: 2048
+  trip_end_idle_min: 5
+  export_dir: data/runtime/exports
+
+power:
+  monitor: sim                # sim | gpio | wittypi | voltage | none
+  gpio_pin: 17
+  active_low: false
+  debounce_s: 2
+  shutdown_delay_s: 30
+  low_voltage_v: 11.6
+  low_voltage_hold_s: 20
+  shutdown_command: ["systemctl", "poweroff"]
+  dry_run: true               # set false on the Pi once the wiring is validated
+
+gps:
+  provider: sim               # sim | gpsd | nmea | none
+  host: 127.0.0.1
+  port: 2947
+  # nmea_path: tests/fixtures/gps/loop.nmea
+
+radar:
+  provider: mock              # mock | r8link | serial | none
+  # address: "E0:00:00:00:23:D4"   # BLE MAC for r8link (Linux/BlueZ only)
+  beep: false
+  merge_window_s: 3
+  hotspot_radius_m: 150
+
+camera:
+  source: file                # file | v4l2 | picamera | none
+  # path: tests/fixtures/video/sample.mp4
+  device: /dev/video0
+  width: 1280
+  height: 720
+  fps: 30
+  bitrate_kbps: 4000
+  segment_s: 10
+  ring_minutes: 3
+  max_disk_gb: 20
+  clips_dir: data/runtime/clips
+  pre_event_s: 30
+  post_event_s: 15
+  overlay: false
+  clip_on_radar: false
+
+perception:
+  detector: "null"            # "null" | onnx | hailo | coral
+  # model_path: models/yolov8n.onnx
+  fps: 5
+  conf_threshold: 0.35
+  nms_iou: 0.5
+  closing_fast_experimental: false
+  sign_ocr_experimental: false
+
+copilot:
+  backend: template           # template | llama | ollama
+  model: qwen2.5:1.5b-instruct
+  url: http://127.0.0.1:11434
+  max_tokens: 220
+  temperature: 0.3
+  stt: "null"                 # "null" | whisper | mock
+  tts: "null"                 # "null" | piper
+  policy:
+    moving_speed_kph: 4.8     # ~3 mph: above this only short templated alerts are allowed
+    push_to_talk_while_moving: false
+    summary_on_trip_end: true
+
+ui:
+  theme: night                # night | day | auto
+  night_start_hour: 19
+  night_end_hour: 6
+  lockout_speed_kph: 4.8
+  ws_hz: 15
+  thresholds:
+    shift_warn_rpm: 6000
+    shift_redline_rpm: 6500
+    coolant_warn_c: 110
+    iat_warn_c: 60
+    volt_low_v: 12.2
+    volt_high_v: 15.2
+    boost_gauge_max_kpa: 150
+
+api:
+  host: 127.0.0.1             # 0.0.0.0 exposes the API to your LAN - trusted networks only
+  port: 8765
+  cors_origins: []
+  serve_web: true
+
+sim:
+  scenario: demo_drive
+  seed: 42
+  time_scale: 1.0
+  loop: true
+  dropout: true               # simulate occasional adapter drop-outs
+
+log:
+  level: INFO
+  json_format: false
+  # file: /data/log/gti-copilot.log

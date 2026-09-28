@@ -1,0 +1,76 @@
+# Vehicle profile: 2016 Volkswagen Golf GTI Autobahn (MK7, EA888 Gen3 2.0 TSI)
+#
+# NOTE: gear ratios, final drives and torque figures below are *approximations* assembled from
+# publicly quoted spec sheets and are used only for the gear estimate and the simulator. They are
+# not calibration data. Adjust `transmission` to match your car (6-speed manual MQ350 shown; the
+# DSG DQ250 profile is provided as an alternative block you can swap in).
+
+name: "2016 VW Golf GTI Autobahn (MK7)"
+engine:
+  code: EA888 Gen3 2.0 TSI
+  displacement_l: 2.0
+  cylinders: 4
+  idle_rpm: 800
+  redline_rpm: 6800
+  max_rpm: 7000
+  # crude torque curve for the simulator (Nm at RPM, stock-ish ~350 Nm plateau)
+  torque_curve_nm:
+    - [1000, 180]
+    - [1500, 300]
+    - [2000, 350]
+    - [4500, 350]
+    - [5500, 320]
+    - [6500, 260]
+    - [7000, 200]
+  peak_boost_kpa: 105          # ~15 psi gauge at peak (stock 14-16 psi)
+  turbo_spool_tau_s: 0.6       # first-order lag for boost build
+  thermostat_c: 90
+  warmup_tau_s: 240
+
+transmission:
+  type: manual                 # manual | dsg
+  # per-gear ratio and the final drive that applies to that gear (MQ350 has two final drives)
+  gears:
+    - { gear: 1, ratio: 3.769, final_drive: 3.647 }
+    - { gear: 2, ratio: 2.087, final_drive: 3.647 }
+    - { gear: 3, ratio: 1.469, final_drive: 3.647 }
+    - { gear: 4, ratio: 1.088, final_drive: 3.647 }
+    - { gear: 5, ratio: 1.108, final_drive: 2.760 }
+    - { gear: 6, ratio: 0.925, final_drive: 2.760 }
+  shift_time_s: 0.45
+  # DSG alternative (DQ250, approximate):
+  # gears:
+  #   - { gear: 1, ratio: 3.462, final_drive: 4.118 }
+  #   - { gear: 2, ratio: 2.050, final_drive: 4.118 }
+  #   - { gear: 3, ratio: 1.300, final_drive: 4.118 }
+  #   - { gear: 4, ratio: 0.902, final_drive: 4.118 }
+  #   - { gear: 5, ratio: 0.914, final_drive: 3.043 }
+  #   - { gear: 6, ratio: 0.756, final_drive: 3.043 }
+
+tire:
+  width_mm: 225
+  aspect_pct: 40
+  rim_in: 18
+
+mass_kg: 1400                  # curb + driver, approximate
+drag_cd: 0.31
+frontal_area_m2: 2.2
+rolling_resistance: 0.012
+drivetrain_efficiency: 0.88
+
+gauges:
+  rpm: { min: 0, max: 7000, warn: 6000, redline: 6500 }
+  speed_kph: { min: 0, max: 260 }
+  boost_kpa: { min: -100, max: 150, warn: 130 }
+  coolant_c: { min: 40, max: 130, warn: 110 }
+  iat_c: { min: -20, max: 80, warn: 60 }
+  volt_v: { min: 10, max: 16, low: 12.2, high: 15.2 }
+  load_pct: { min: 0, max: 100 }
+  throttle_pct: { min: 0, max: 100 }
+
+# PID hints for this ECU. `expected` PIDs are queried in the support-bitmap scan; anything the
+# car does not report as supported is simply skipped. `optional` PIDs light up extra gauges when
+# present (auto-detected). All hardware-unverified until the validation checklist is run.
+pids:
+  expected: [0x04, 0x05, 0x06, 0x07, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x2F, 0x33, 0x42, 0x45, 0x46, 0x49, 0x4A]
+  optional: [0x0A, 0x5C, 0x5E, 0x6F, 0x70]
