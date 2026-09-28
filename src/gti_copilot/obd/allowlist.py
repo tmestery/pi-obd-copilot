@@ -154,10 +154,9 @@ class ReadOnlyGuard:
 
     @property
     def allowed_services(self) -> frozenset[int]:
+        # frozen=True already makes instances immutable (assignment raises FrozenInstanceError,
+        # a subclass of AttributeError); there is intentionally no way to disable the guard.
         return ALLOWED_SERVICES
-
-    def __setattr__(self, name: str, value: object) -> None:  # pragma: no cover - frozen
-        raise AttributeError("ReadOnlyGuard is immutable")
 
 
 GUARD: Final[ReadOnlyGuard] = ReadOnlyGuard()
