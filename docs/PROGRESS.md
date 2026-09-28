@@ -7,8 +7,8 @@ Resumable state of the build. If you are picking this up cold: read `PLAN.md`, t
 
 | #  | Branch                       | Status      | PR |
 | -- | ---------------------------- | ----------- | -- |
-| 0  | `chore/bootstrap`            | in progress |    |
-| 1  | `feat/core-domain`           | todo        |    |
+| 0  | `chore/bootstrap`            | merged      | [#1](https://github.com/tmestery/pi-obd-copilot/pull/1) |
+| 1  | `feat/core-domain`           | in review   | #2 |
 | 2  | `feat/obd-transport-sim`     | todo        |    |
 | 3  | `feat/obd-elm-transport`     | todo        |    |
 | 4  | `feat/acquisition-storage`   | todo        |    |
@@ -28,7 +28,7 @@ Resumable state of the build. If you are picking this up cold: read `PLAN.md`, t
 
 ## Current step
 
-PR 0: scaffolding written; opening the PR and waiting for CI.
+PR 1: core domain (config, units, logging, errors, PID table, derived metrics) written and tested; PR open.
 
 ## Releases
 
@@ -41,12 +41,12 @@ PR 0: scaffolding written; opening the PR and waiting for CI.
 
 ## Known issues
 
-- None yet.
+- PR #1 was merged by the owner before the `force-include` build fix landed, so `main` CI was red for one commit; PR #2 carries the fix (`fix(build)` commit).
 
 ## Next action
 
-Merge PR 0, then start PR 1 (`feat/core-domain`): config models, units, logging, errors, PID
-table, derived metrics with property tests.
+Merge PR 2, then start PR 2 of the plan (`feat/obd-transport-sim`): transport protocol, allowlist,
+physics model, scenarios, SimTransport, scheduler.
 
 ## Definition-of-done verification (filled in at the end)
 
