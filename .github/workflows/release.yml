@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build wheel + web assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Build web assets (if the frontend exists)
+        run: |
+          if [ -f src/gti_copilot/web/package.json ]; then
+            cd src/gti_copilot/web && npm ci && npm run build && cd -
+            tar -C src/gti_copilot/web -czf gti-copilot-web-${GITHUB_REF_NAME}.tar.gz dist
+          fi
+      - name: Build Python package
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+      - name: Upload release assets
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes "See CHANGELOG.md"
+          gh release upload "$GITHUB_REF_NAME" dist/* --clobber
+          ls gti-copilot-web-*.tar.gz >/dev/null 2>&1 && gh release upload "$GITHUB_REF_NAME" gti-copilot-web-*.tar.gz --clobber || true
